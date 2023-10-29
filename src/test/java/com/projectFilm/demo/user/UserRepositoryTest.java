@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,19 +25,23 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void call_userId() {
-        String userId = "testuser";
-        String userPw = "1234qwer";
+    @Transactional
+    public void UserTest() {
 
-        userRepository.save(UserModel.builder()
-                .userId(userId)
-                .userPw(userPw)
-                .build());
+        userRepository.save(User.builder()
+                        .userNo(1)
+                        .userId("test_user")
+                        .userPw("1234qwer")
+                        .build());
 
-        List<UserModel> userModelList = userRepository.findAll();
+        List<User> userList = userRepository.findAll();
 
-        UserModel userModel = userModelList.get(0);
-        assertThat(userModel.getUserId()).isEqualTo(userId);
-        assertThat(userModel.getUserPw()).isEqualTo(userPw);
+        User user = userList.get(0);
+        System.out.println(user.getUserId());
+        System.out.println(user.getUserNo());
+        System.out.println(user.getUserPw());
+        assertThat(user.getUserNo()).isEqualTo(1);
+        assertThat(user.getUserId()).isEqualTo("test_user");
+        assertThat(user.getUserPw()).isEqualTo("1234qwer");
     }
 }

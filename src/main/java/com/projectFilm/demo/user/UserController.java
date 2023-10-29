@@ -12,15 +12,21 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     @GetMapping("/")
-    public String HomePage() throws Exception{
-        return "OK! this is HomePage!";
+    public String HomePage() {
+        return "OK! this is Tomcat HomePage!";
     }
     public final UserRepository userRepository;
 
     @PostMapping("/regist")
-    public String SetUser(@RequestBody UserModel userModel) throws Exception{
-        userRepository.save(userModel);
-        return "SAVE COMPLETE";
+    public String SetUser(@RequestBody User user) {
+        try {
+            userRepository.save(user);
+            return "SAVE COMPLETE";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "SAVE FAILED";
+        }
+
     }
 
 }
