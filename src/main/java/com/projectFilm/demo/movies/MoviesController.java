@@ -2,11 +2,10 @@ package com.projectFilm.demo.movies;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @CrossOrigin(origins = "*")
@@ -17,14 +16,26 @@ public class MoviesController {
 	private MoviesRepository moviesRepository;
 
 	@GetMapping("/movies")
-	public List<Movies> ShowAllList() {
+	public List<Movies> ResponseAllList() {
 		try {
 			return moviesRepository.findAll();
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString());
 			return null;
 
 		}
 
 	}
+	@PostMapping("/movies/one")
+	public Optional<Movies> PostOneList(@RequestBody int movieCd) {
+		try {
+			return moviesRepository.findById(String.valueOf(movieCd));
+		} catch (Exception e) {
+			log.error(e.toString());
+			return Optional.empty();
+
+		}
+
+	}
+
 }
