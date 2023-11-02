@@ -2,6 +2,8 @@ package com.projectFilm.demo.movies;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,11 +29,24 @@ public class MoviesController {
 
 	}
 	@PostMapping("/movies/one")
-	public Optional<Movies> PostOneList(@RequestBody int movieCd) {
+	public Object PostOneList(@RequestBody int movieCd) {
 		try {
-			return moviesRepository.findById(String.valueOf(movieCd));
+			Optional<Movies> result = moviesRepository.findById(String.valueOf(movieCd));
+			System.out.println(result);
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Content-Type", "application/json");
+
+			// ResponseEntity로 응답 생성
+			ResponseEntity<Optional<Movies>> rtn = ResponseEntity.ok()
+					.headers(headers)
+					.body(result);
+			System.out.println(rtn);
+			return rtn;
+
 		} catch (Exception e) {
-			log.error(e.toString());
+//			log.error(e.toString());
+			System.out.println(e.toString());
 			return Optional.empty();
 
 		}
