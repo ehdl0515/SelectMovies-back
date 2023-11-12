@@ -9,6 +9,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Getter
+@Setter
 public class Movies {
 
 	@Id
@@ -24,20 +25,5 @@ public class Movies {
 	public String genreAlt;
 	public String repNationNm;
 	public String repGenreNm;
-
-	public Movies(String movieCd_,String movieNm_,String movieNmEn_,short prdtYear_,int openDt_,String typeNm_,String prdtStatNm_,String nationAlt_,String genreAlt_,String repNationNm_,String repGenreNm_)
-	{
-		this.movieCd = movieCd_;
-		this.movieNm = movieNm_;
-		this.movieNmEn = movieNmEn_;
-		this.prdtYear = prdtYear_;
-		this.openDt = openDt_;
-		this.typeNm = typeNm_;
-		this.prdtStatNm = prdtStatNm_;
-		this.nationAlt = nationAlt_;
-		this.genreAlt = genreAlt_;
-		this.repNationNm = repNationNm_;
-		this.repGenreNm = repGenreNm_;
-	}
 }
 

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,25 +20,58 @@ public class MoviesController {
 	private MoviesRepository moviesRepository;
 
 	@GetMapping("/movies")
-	public Page<Movies> ResponseAllListWithPage(@RequestParam(required = false, defaultValue = "0") int page) {
+	public Page<Movies> ResponseAllListWithPage(
+			@RequestParam(required = false, defaultValue = "0") int page,
+			@RequestParam(required = false, defaultValue = "0") int genreId) {
 		try {
-			return moviesRepository.findAll(PageRequest.of(page, 10, Sort.by("openDt").descending()));
+			Page<Movies> result;
+
+			if (genreId == 0) {
+				result = moviesRepository.findAll(PageRequest.of(page, 10, Sort.by("openDt").descending()));
+			} else {
+				Pageable pageable = PageRequest.of(page, 10, Sort.by("openDt").descending());
+				result = moviesRepository.findMoviesByGenreNotContainingPage(genreId, pageable);
+			}
+			return result;
 		} catch (Exception e) {
 			log.error(e.toString());
 			return null;
 		}
 	}
 
-	@GetMapping("/movies/all")
-	public long ResponseAllList() {
+	@GetMapping("/movies/count/all")
+	public long ResponseAllCount(@RequestParam(required = false, defaultValue = "0") int genreId) {
 		try {
-//			List<Movies> result = moviesRepository.findMoviesWithLimit(175);
-			long result = moviesRepository.count();
+			long result;
+			if (genreId == 0) {
+				result = moviesRepository.count();
+
+			} else {
+				result = moviesRepository.countMoviesByGenreNotContaining(genreId);
+
+			}
 //			log.info(String.valueOf(result));
 			return result;
 		} catch (Exception e) {
 			log.error(e.toString());
 			return 0;
+		}
+	}
+
+	@GetMapping("/movies/all")
+	public List<Movies> ResponseAllData(@RequestParam(required = false, defaultValue = "0") int genreId) {
+		try {
+			List<Movies> result;
+			if (genreId == 0) {
+				result = moviesRepository.findAll();
+			} else {
+				result = moviesRepository.findMoviesByGenreNotContaining(genreId);
+			}
+//			log.info(String.valueOf(result));
+			return result;
+		} catch (Exception e) {
+			log.error(e.toString());
+			return null;
 		}
 	}
 
