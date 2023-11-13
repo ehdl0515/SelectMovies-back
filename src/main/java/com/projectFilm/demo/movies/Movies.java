@@ -1,5 +1,6 @@
 package com.projectFilm.demo.movies;
 
+import com.projectFilm.demo.moviesGenre.MoviesGenre;
 import lombok.*;
 
 import javax.persistence.*;
@@ -9,7 +10,6 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Getter
-@Setter
 public class Movies {
 
 	@Id
@@ -25,5 +25,9 @@ public class Movies {
 	public String genreAlt;
 	public String repNationNm;
 	public String repGenreNm;
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "movieCd")
+	private MoviesGenre moviesGenre;
 }
 

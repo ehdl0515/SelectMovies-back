@@ -1,5 +1,7 @@
 package com.projectFilm.demo.movies;
 
+import com.projectFilm.demo.moviesGenre.QMoviesGenre;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -8,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +21,15 @@ public class MoviesController {
 
 	@Autowired
 	private MoviesRepository moviesRepository;
+
+	@Autowired
+	EntityManager em;
+
+	JPAQueryFactory queryFactory;
+
+
+	QMovies m = QMovies.movies;
+	QMoviesGenre mg = QMoviesGenre.moviesGenre;
 
 	@GetMapping("/movies")
 	public Page<Movies> ResponseAllListWithPage(
@@ -39,17 +51,37 @@ public class MoviesController {
 		}
 	}
 
+//	@GetMapping("/movies/count/all")
+//	public long ResponseAllCount(@RequestParam(required = false, defaultValue = "0") int genreId) {
+//		try {
+//			long result;
+//			if (genreId == 0) {
+//				result = moviesRepository.count();
+//
+//			} else {
+//				result = moviesRepository.countMoviesByGenreNotContaining(genreId);
+//
+//			}
+////			log.info(String.valueOf(result));
+//			return result;
+//		} catch (Exception e) {
+//			log.error(e.toString());
+//			return 0;
+//		}
+//	}
+
 	@GetMapping("/movies/count/all")
-	public long ResponseAllCount(@RequestParam(required = false, defaultValue = "0") int genreId) {
+	public long ResponseAllCount(
+			@RequestParam(required = false, defaultValue = "") List<Integer> genreIds) {
 		try {
-			long result;
-			if (genreId == 0) {
-				result = moviesRepository.count();
+			queryFactory = new JPAQueryFactory(em);
 
-			} else {
-				result = moviesRepository.countMoviesByGenreNotContaining(genreId);
-
-			}
+			long result = queryFactory
+					.select(m)
+					.from(m)
+					.join(mg).on(mg.genreId.notIn(genreIds))
+					.fetchAll().stream().count();
+			System.out.println("result:" + result);
 //			log.info(String.valueOf(result));
 			return result;
 		} catch (Exception e) {
