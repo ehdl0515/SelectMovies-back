@@ -1,7 +1,8 @@
-package com.projectFilm.demo.movies;
+package com.projectFilm.demo.movies.controller;
 
-import com.projectFilm.demo.moviesGenre.QMoviesGenre;
-import com.querydsl.jpa.impl.JPAQuery;
+import com.projectFilm.demo.movies.repository.MoviesRepository;
+import com.projectFilm.demo.movies.entity.Movies;
+import com.projectFilm.demo.movies.repository.MoviesSearchCondition;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
+
+import static com.projectFilm.demo.movies.QMovies.*;
+import static com.projectFilm.demo.moviesGenre.QMoviesGenre.*;
 
 @Slf4j
 @CrossOrigin(origins = "*")
@@ -29,8 +33,6 @@ public class MoviesController {
 	JPAQueryFactory queryFactory;
 
 
-	QMovies m = QMovies.movies;
-	QMoviesGenre mg = QMoviesGenre.moviesGenre;
 
 	@GetMapping("/movies")
 	public Page<Movies> ResponseAllListWithPage(
@@ -52,41 +54,20 @@ public class MoviesController {
 		}
 	}
 
-//	@GetMapping("/movies/count/all")
-//	public long ResponseAllCount(@RequestParam(required = false, defaultValue = "0") int genreId) {
-//		try {
-//			long result;
-//			if (genreId == 0) {
-//				result = moviesRepository.count();
-//
-//			} else {
-//				result = moviesRepository.countMoviesByGenreNotContaining(genreId);
-//
-//			}
-////			log.info(String.valueOf(result));
-//			return result;
-//		} catch (Exception e) {
-//			log.error(e.toString());
-//			return 0;
-//		}
-//	}
-
 	@GetMapping("/movies/count/all")
-	public long ResponseAllCount(
+	public Object ResponseAllCount(
 			@RequestParam(required = false, defaultValue = "") List<Integer> genreIds,
 			@RequestParam(required = false, defaultValue = "") List<Short> prdtYears
 	) {
 		try {
 			queryFactory = new JPAQueryFactory(em);
+			MoviesSearchCondition condition = new MoviesSearchCondition();
 
-			List<Movies> result = queryFactory
-					.select(m)
-					.from(m)
-					.leftJoin(m.moviesGenre, mg).on(mg.movieCd.eq(m.movieCd))
-					.where(mg.genreId.notIn(genreIds))
-					.where(m.prdtYear.notIn(prdtYears))
-					.fetch();
-			long count = result.size();
+			condition.setGenreId(1);
+			condition.setPrdtStatNm("개봉");
+
+			List<Movies> result = condition.searchByBuilder(condition);
+			int count = result.size();
 			System.out.println("count:" + count);
 //			log.info(String.valueOf(result));
 			return count;
@@ -95,6 +76,9 @@ public class MoviesController {
 			return 0;
 		}
 	}
+
+
+
 
 	@GetMapping("/movies/all")
 	public List<Movies> ResponseAllData(@RequestParam(required = false, defaultValue = "0") int genreId) {

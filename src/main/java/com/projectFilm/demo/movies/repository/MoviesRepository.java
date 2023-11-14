@@ -11,7 +11,7 @@ import java.util.List;
 
 
 @Repository
-public interface MoviesRepository extends JpaRepository<Movies, String> {
+public interface MoviesRepository extends JpaRepository<Movies, String>, MoviesRepositoryCustom {
 	@Query(value = "SELECT * FROM Movies LIMIT :limit", nativeQuery = true)
 	List<Movies> findMoviesWithLimit(int limit);
 
