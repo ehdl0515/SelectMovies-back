@@ -26,8 +26,7 @@ public class Movies {
 	public String repNationNm;
 	public String repGenreNm;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "movieCd")
+	@OneToOne(mappedBy = "movies")
 	private MoviesGenre moviesGenre;
 }
 

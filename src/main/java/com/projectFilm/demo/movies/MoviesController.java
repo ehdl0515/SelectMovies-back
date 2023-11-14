@@ -1,6 +1,7 @@
 package com.projectFilm.demo.movies;
 
 import com.projectFilm.demo.moviesGenre.QMoviesGenre;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,18 +73,23 @@ public class MoviesController {
 
 	@GetMapping("/movies/count/all")
 	public long ResponseAllCount(
-			@RequestParam(required = false, defaultValue = "") List<Integer> genreIds) {
+			@RequestParam(required = false, defaultValue = "") List<Integer> genreIds,
+			@RequestParam(required = false, defaultValue = "") List<Short> prdtYears
+	) {
 		try {
 			queryFactory = new JPAQueryFactory(em);
 
-			long result = queryFactory
+			List<Movies> result = queryFactory
 					.select(m)
 					.from(m)
-					.join(mg).on(mg.genreId.notIn(genreIds))
-					.fetchAll().stream().count();
-			System.out.println("result:" + result);
+					.leftJoin(m.moviesGenre, mg).on(mg.movieCd.eq(m.movieCd))
+					.where(mg.genreId.notIn(genreIds))
+					.where(m.prdtYear.notIn(prdtYears))
+					.fetch();
+			long count = result.size();
+			System.out.println("count:" + count);
 //			log.info(String.valueOf(result));
-			return result;
+			return count;
 		} catch (Exception e) {
 			log.error(e.toString());
 			return 0;

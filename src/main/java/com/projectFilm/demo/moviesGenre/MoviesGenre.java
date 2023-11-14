@@ -4,9 +4,7 @@ import com.projectFilm.demo.movies.Movies;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @NoArgsConstructor
 @Entity
@@ -18,9 +16,11 @@ public class MoviesGenre {
 
 	public Integer genreId;
 	public String mainGenre;
-	public String otherGenre;
+	public String otherGenres;
 
-	@OneToOne(mappedBy = "moviesGenre")
+	@OneToOne
+//	@JoinColumn(name = "movie_fk")
+	@JoinColumn(name = "movieCd", referencedColumnName = "movieCd")
 	private Movies movies;
 
 }
