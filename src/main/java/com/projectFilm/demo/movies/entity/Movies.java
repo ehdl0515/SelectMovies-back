@@ -6,7 +6,6 @@ import javax.persistence.*;
 
 
 
-@NoArgsConstructor
 @Entity
 @Getter
 public class Movies {
