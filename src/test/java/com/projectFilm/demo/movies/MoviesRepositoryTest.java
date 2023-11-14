@@ -1,5 +1,7 @@
 package com.projectFilm.demo.movies;
 
+import com.projectFilm.demo.movies.entity.Movies;
+import com.projectFilm.demo.movies.repository.MoviesRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
