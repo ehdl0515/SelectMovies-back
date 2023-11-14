@@ -1,6 +1,5 @@
-package com.projectFilm.demo.movies;
+package com.projectFilm.demo.movies.entity;
 
-import com.projectFilm.demo.moviesGenre.MoviesGenre;
 import lombok.*;
 
 import javax.persistence.*;
@@ -25,8 +24,5 @@ public class Movies {
 	public String genreAlt;
 	public String repNationNm;
 	public String repGenreNm;
-
-	@OneToOne(mappedBy = "movies")
-	private MoviesGenre moviesGenre;
 }
 

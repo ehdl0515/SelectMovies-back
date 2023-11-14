@@ -1,6 +1,5 @@
-package com.projectFilm.demo.moviesGenre;
+package com.projectFilm.demo.movies.entity;
 
-import com.projectFilm.demo.movies.Movies;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,10 +16,4 @@ public class MoviesGenre {
 	public Integer genreId;
 	public String mainGenre;
 	public String otherGenres;
-
-	@OneToOne
-//	@JoinColumn(name = "movie_fk")
-	@JoinColumn(name = "movieCd", referencedColumnName = "movieCd")
-	private Movies movies;
-
 }
