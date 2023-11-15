@@ -1,18 +1,18 @@
 package com.projectFilm.demo.movies.repository;
 
 import com.projectFilm.demo.movies.entity.Movies;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
 
-import static com.projectFilm.demo.movies.QMovies.movies;
-import static com.projectFilm.demo.moviesGenre.QMoviesGenre.moviesGenre;
+import static com.projectFilm.demo.movies.entity.QMovies.movies;
+import static com.projectFilm.demo.movies.entity.QMoviesGenre.moviesGenre;
+import static org.springframework.util.StringUtils.hasText;
 
 public abstract class MoviesRepositoryImpl implements MoviesRepositoryCustom {
 
@@ -23,16 +23,32 @@ public abstract class MoviesRepositoryImpl implements MoviesRepositoryCustom {
 	}
 
 	@Override
-	public Page<Movies> searchPage(MoviesSearchCondition condition, Pageable pageable) {
+	public Page<Movies> findAllBy(MoviesSearchCondition condition, Pageable pageable) {
+
+		BooleanBuilder builder = new BooleanBuilder();
+
+		builder.and(movies.movieCd.eq(moviesGenre.movieCd));
+
+		if (hasText(condition.getPrdtStatNm())) {
+			builder.and(movies.prdtStatNm.eq(condition.getPrdtStatNm()));
+		}
+
+		if (condition.getGenreId() != null) {
+			builder.and(movies.genreAlt.eq(String.valueOf(condition.getGenreId())));
+		}
+
+		if (condition.getOpenDtGoe() != null) {
+			builder.and(movies.openDt.goe(condition.getOpenDtGoe()));
+		}
+		if (condition.getOpenDtLoe() != null) {
+			builder.and(movies.openDt.loe(condition.getOpenDtLoe()));
+		}
+
 
 		List<Movies> content = queryFactory
 				.select(movies)
 				.from(movies, moviesGenre)
-				.where(
-						moviesGenre.movieCd.eq(movies.movieCd),
-						moviesGenre.genreId.notIn(condition.getgenreIds()),
-						movies.prdtYear.notIn(condition.getprdtYears())
-				)
+				.where(builder)
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.fetch();
@@ -40,11 +56,8 @@ public abstract class MoviesRepositoryImpl implements MoviesRepositoryCustom {
 		JPAQuery<Long> countQuery = queryFactory
 				.select(movies.count())
 				.from(movies, moviesGenre)
-				.where(
-						moviesGenre.movieCd.eq(movies.movieCd),
-						moviesGenre.genreId.notIn(condition.getgenreIds()),
-						movies.prdtYear.notIn(condition.getprdtYears())
-				);
+				.where(builder);
+
 		return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
 	}
 }

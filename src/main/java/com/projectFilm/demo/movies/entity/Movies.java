@@ -1,5 +1,6 @@
 package com.projectFilm.demo.movies.entity;
 
+import com.projectFilm.demo.movies.repository.MoviesSearchCondition;
 import lombok.*;
 
 import javax.persistence.*;

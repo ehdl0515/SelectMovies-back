@@ -12,6 +12,7 @@ import java.util.List;
 
 @Repository
 public interface MoviesRepository extends JpaRepository<Movies, String>, MoviesRepositoryCustom {
+
 	@Query(value = "SELECT * FROM Movies LIMIT :limit", nativeQuery = true)
 	List<Movies> findMoviesWithLimit(int limit);
 
@@ -23,4 +24,7 @@ public interface MoviesRepository extends JpaRepository<Movies, String>, MoviesR
 
 	@Query(value = "SELECT count(MV.movieCd) FROM Movies MV INNER JOIN MoviesGenre MVGR ON MV.movieCd = MVGR.movieCd WHERE MVGR.genreId != :GenreId", nativeQuery = true)
 	long countMoviesByGenreNotContaining(int GenreId);
+
+	Page<Movies> findAllBy(MoviesSearchCondition condition, Pageable pageable);
+
 }

@@ -16,8 +16,7 @@ import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
-import static com.projectFilm.demo.movies.QMovies.*;
-import static com.projectFilm.demo.moviesGenre.QMoviesGenre.*;
+import static com.querydsl.core.types.dsl.Wildcard.count;
 
 @Slf4j
 @CrossOrigin(origins = "*")
@@ -65,12 +64,13 @@ public class MoviesController {
 
 			condition.setGenreId(1);
 			condition.setPrdtStatNm("개봉");
+			condition.setOpenDtLoe(2000);
+			Pageable pageable = PageRequest.of(1, 10, Sort.by("openDt").descending());
 
-			List<Movies> result = condition.searchByBuilder(condition);
-			int count = result.size();
-			System.out.println("count:" + count);
+			Page<Movies> result = moviesRepository.findAllBy(condition, pageable);
+			System.out.println("result:" + result);
 //			log.info(String.valueOf(result));
-			return count;
+			return result;
 		} catch (Exception e) {
 			log.error(e.toString());
 			return 0;
