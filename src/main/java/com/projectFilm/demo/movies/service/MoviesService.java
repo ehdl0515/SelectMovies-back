@@ -5,6 +5,7 @@ import com.projectFilm.demo.movies.entity.MoviesRequestDTO;
 import com.projectFilm.demo.movies.repository.MoviesRepository;
 import com.projectFilm.demo.movies.repository.MoviesSearchCondition;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MoviesService {
@@ -22,7 +24,7 @@ public class MoviesService {
 	public List<Movies> getAllMovies(MoviesRequestDTO requestDTO) {
 
 		MoviesSearchCondition condition = createMoviesSearchCondition(requestDTO);
-		System.out.println("condition = " + condition);
+		log.info("condition = " + condition);
 
 		return moviesRepository.search(condition);
 	}
@@ -30,10 +32,10 @@ public class MoviesService {
 	public Page<Movies> getAllMoviesWithPage(MoviesRequestDTO requestDTO) {
 
 		MoviesSearchCondition condition = createMoviesSearchCondition(requestDTO);
-		System.out.println("condition = " + condition);
+		log.info("condition = " + condition);
 
 		Pageable pageable = createPageable(requestDTO);
-		System.out.println("pageable = " + pageable);
+		log.info("pageable = " + pageable);
 
 		return moviesRepository.searchPage(condition, pageable);
 	}
@@ -55,10 +57,29 @@ public class MoviesService {
 	}
 
 	public Pageable createPageable(MoviesRequestDTO requestDTO) {
+		int page;
+		int size;
+
+		if (requestDTO.getPage() == null) {
+			page = 0;
+		} else {
+			page = requestDTO.getPage();
+		}
+
+		if (requestDTO.getSize() == null) {
+			size = 10;
+		} else {
+			size = requestDTO.getSize();
+		}
+
+		if (requestDTO.getSortColumn() == null) {
+			return PageRequest.of(page, size);
+		}
+
 		Sort setSortCondition = Sort.by(requestDTO.getSortColumn()).descending();
 		if (!requestDTO.getSortDesc())  {
 			setSortCondition = Sort.by(requestDTO.getSortColumn()).ascending();
 		}
-		return PageRequest.of(requestDTO.getPage(), requestDTO.getSize(), setSortCondition);
+		return PageRequest.of(page, size, setSortCondition);
 	}
 }

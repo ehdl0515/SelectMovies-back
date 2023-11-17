@@ -24,35 +24,31 @@ public class MoviesController {
 	}
 
 	@GetMapping("movies")
-	public Object ResponseAllMovies(@ModelAttribute MoviesRequestDTO requestDTO) {
+	public List<Movies> ResponseAllMovies(@ModelAttribute MoviesRequestDTO requestDTO) {
 		try {
-			System.out.println("requestDTO = " + requestDTO);
-			List<Movies> result = moviesService.getAllMovies(requestDTO);
+			log.info("Request to path = '/movies' with params: " + requestDTO);
+			List<Movies> response = moviesService.getAllMovies(requestDTO);
 
-			System.out.println("result:" + result);
-			log.info("result: " + result);
-			return result;
+			log.info("Response = " + response);
+			return response;
 		} catch (Exception e) {
-			System.out.println("e:" + e);
 			log.error(e.toString());
-			return 0;
+			return null;
 		}
 	}
 
 	@GetMapping("movies/page")
-	public Object ResponseAllMoviesWithPage(@ModelAttribute MoviesRequestDTO requestDTO) {
+	public Page<Movies> ResponseAllMoviesWithPage(@ModelAttribute MoviesRequestDTO requestDTO) {
 		try {
-			log.info("Request From User: url:'/movies/page' with params");
+			log.info("Request to path = '/movies/page' with params: " + requestDTO);
 
-			Page<Movies> result = moviesService.getAllMoviesWithPage(requestDTO);
+			Page<Movies> response = moviesService.getAllMoviesWithPage(requestDTO);
 
-			System.out.println("result:" + result);
-			log.info("result: " + result);
-			return result;
+			log.info("Response = " + response);
+			return response;
 		} catch (Exception e) {
-			System.out.println("e:" + e);
 			log.error(e.toString());
-			return 0;
+			return null;
 		}
 	}
 }
