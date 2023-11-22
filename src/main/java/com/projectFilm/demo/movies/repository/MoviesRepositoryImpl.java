@@ -2,15 +2,19 @@ package com.projectFilm.demo.movies.repository;
 
 import com.projectFilm.demo.movies.entity.Movies;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.projectFilm.demo.movies.entity.QMovies.movies;
@@ -27,32 +31,28 @@ class MoviesRepositoryImpl extends QuerydslRepositorySupport{
 		this.jpaQueryFactory = jpaQueryFactory;
 	}
 
+	public List<Movies> search(MoviesSearchCondition condition) {
+
+		BooleanBuilder whereClause = buildWhereClause(condition);
+
+		return jpaQueryFactory
+				.select(movies)
+				.from(movies, moviesGenre)
+				.where(whereClause)
+				.fetch();
+	}
+
+
 	public Page<Movies> searchPage(MoviesSearchCondition condition, Pageable pageable) {
 
-		BooleanBuilder builder = new BooleanBuilder();
-
-		builder.and(movies.movieCd.eq(moviesGenre.movieCd));
-
-		if (hasText(condition.getPrdtStatNm())) {
-			builder.and(movies.prdtStatNm.eq(condition.getPrdtStatNm()));
-		}
-
-		if (condition.getGenreId() != null) {
-			builder.and(moviesGenre.genreId.eq(condition.getGenreId()));
-		}
-
-		if (condition.getOpenDtGoe() != null) {
-			builder.and(movies.openDt.goe(condition.getOpenDtGoe()));
-		}
-		if (condition.getOpenDtLoe() != null) {
-			builder.and(movies.openDt.loe(condition.getOpenDtLoe()));
-		}
+		BooleanBuilder whereClause = buildWhereClause(condition);
 
 		System.out.println("pageable = " + pageable);
 		List<Movies> content = jpaQueryFactory
 				.select(movies)
 				.from(movies, moviesGenre)
-				.where(builder)
+				.where(whereClause)
+				.orderBy(getOrderSpecifier(pageable.getSort()).toArray(new OrderSpecifier[0]))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.fetch();
@@ -61,10 +61,61 @@ class MoviesRepositoryImpl extends QuerydslRepositorySupport{
 		JPAQuery<Long> countQuery = jpaQueryFactory
 				.select(movies.count())
 				.from(movies, moviesGenre)
-				.where(builder);
+				.where(whereClause);
 
 		System.out.println("countQuery = " + countQuery);
-//		return new PageImpl<>(content, pageable, total);
 		return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
 	}
+
+
+	private BooleanBuilder buildWhereClause(MoviesSearchCondition condition) {
+		BooleanBuilder whereClause = new BooleanBuilder();
+
+		whereClause.and(movies.movieCd.eq(moviesGenre.movieCd));
+
+		if (condition.getPrdtYearLoe() != null) {
+			whereClause.and(movies.openDt.loe(condition.getOpenDtLoe()));
+		}
+		if (condition.getPrdtYearGoe() != null) {
+			whereClause.and(movies.openDt.goe(condition.getOpenDtGoe()));
+		}
+
+		if (condition.getOpenDtGoe() != null) {
+			whereClause.and(movies.openDt.goe(condition.getOpenDtGoe()));
+		}
+		if (condition.getOpenDtLoe() != null) {
+			whereClause.and(movies.openDt.loe(condition.getOpenDtLoe()));
+		}
+
+		if (condition.getTypeNms() != null && !condition.getTypeNms().isEmpty()) {
+			whereClause.and(movies.typeNm.in(condition.getTypeNms()));
+		}
+
+		if (condition.getPrdtStatNms() != null && !condition.getPrdtStatNms().isEmpty()) {
+			whereClause.and(movies.prdtStatNm.in(condition.getPrdtStatNms()));
+		}
+
+		if (condition.getRepNationNms() != null && !condition.getRepNationNms().isEmpty()) {
+			whereClause.and(movies.repGenreNm.in(condition.getRepNationNms()));
+		}
+
+		if (condition.getGenreIds() != null && !condition.getGenreIds().isEmpty()) {
+			whereClause.and(moviesGenre.genreId.in(condition.getGenreIds()));
+		}
+
+		return whereClause;
+	}
+
+	public List<OrderSpecifier> getOrderSpecifier(Sort sort) {
+		List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
+
+		sort.stream().forEach(order -> {
+			Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+			PathBuilder pathBuilder = new PathBuilder(Movies.class, "movies");
+			String prop = order.getProperty();
+			orderSpecifiers.add(new OrderSpecifier(direction, pathBuilder.get(prop)));
+		});
+		return orderSpecifiers;
+	}
+
 }
