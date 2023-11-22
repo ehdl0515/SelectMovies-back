@@ -1,5 +1,6 @@
 package com.projectFilm.demo.movies.service;
 
+import com.projectFilm.demo.movies.entity.DailyBoxOffice;
 import com.projectFilm.demo.movies.entity.Movies;
 import com.projectFilm.demo.movies.entity.MoviesRequestDTO;
 import com.projectFilm.demo.movies.repository.MoviesRepository;
@@ -39,6 +40,11 @@ public class MoviesService {
 
 		return moviesRepository.searchPage(condition, pageable);
 	}
+
+	public List<DailyBoxOffice> getDailyRank(int dateStamp) {
+		return moviesRepository.searchDailyRank(dateStamp);
+	}
+
 
 	public MoviesSearchCondition createMoviesSearchCondition(
 			MoviesRequestDTO requestDTO) {

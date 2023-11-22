@@ -1,5 +1,6 @@
 package com.projectFilm.demo.movies.controller;
 
+import com.projectFilm.demo.movies.entity.DailyBoxOffice;
 import com.projectFilm.demo.movies.entity.Movies;
 import com.projectFilm.demo.movies.entity.MoviesRequestDTO;
 import com.projectFilm.demo.movies.service.MoviesService;
@@ -51,4 +52,20 @@ public class MoviesController {
 			return null;
 		}
 	}
+
+	@GetMapping("movies/rank/daily")
+	public List<DailyBoxOffice> ResponseAllMoviesWithPage(@RequestParam(value = "dateStamp") int dateStamp) {
+		try {
+			log.info("Request to path = '/movies/rank/daily' with params: " + dateStamp);
+
+			List<DailyBoxOffice> response = moviesService.getDailyRank(dateStamp);
+
+			log.info("Response = " + response);
+			return response;
+		} catch (Exception e) {
+			log.error(e.toString());
+			return null;
+		}
+	}
+
 }

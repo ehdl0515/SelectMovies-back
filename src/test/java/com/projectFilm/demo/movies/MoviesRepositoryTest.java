@@ -1,5 +1,6 @@
 package com.projectFilm.demo.movies;
 
+import com.projectFilm.demo.movies.entity.DailyBoxOffice;
 import com.projectFilm.demo.movies.entity.Movies;
 import com.projectFilm.demo.movies.repository.MoviesRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -33,5 +34,16 @@ public class MoviesRepositoryTest {
 		Movies movies = moviesList.get(0);
 		System.out.println(movies.getMovieCd());
 		assertThat(movies.getMovieCd()).isEqualTo("19820019");
+	}
+
+	@Test
+	@Transactional
+	public void MoviesRankTest() {
+
+		List<DailyBoxOffice> response = moviesRepository.searchDailyRank(20231120);
+
+		DailyBoxOffice rankOneMovie = response.get(0);
+		System.out.println(rankOneMovie.getMovieCd());
+		assertThat(rankOneMovie.getMovieCd()).isEqualTo("20235030");
 	}
 }
