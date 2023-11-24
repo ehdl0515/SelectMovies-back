@@ -15,7 +15,7 @@ import java.util.List;
 @Repository
 public interface MoviesRepository extends JpaRepository<Movies, String> {
 
-	@Query(value = "SELECT * FROM Daily_Box_Office LIMIT :date", nativeQuery = true)
+	@Query(value = "SELECT * FROM Daily_Box_Office where dateStamp = :date order by movieRank", nativeQuery = true)
 	List<DailyBoxOffice> searchDailyRank(@Param("date") int date);
 
 	List<Movies> search(MoviesSearchCondition condition);
