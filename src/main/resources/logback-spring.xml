@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-<!--    <property name="LOG_PATH" value="C:/Users/dongdong/Desktop/SelectMovies-back/logs"/>-->
-    <property name="LOG_PATH" value="/home/admin/deploy/logs"/>
+    <property name="LOG_PATH" value="/home/admin/logs"/>
     <property name="LOG_FILE_NAME" value="backend"/>
     <property name="ERR_LOG_FILE_NAME" value="error"/>
     <property name="LOG_PATTERN" value="%highlight(%-5level) %d{yy-MM-dd HH:mm:ss} [%thread] %cyan([%logger{0}:%line]) - %msg%n"/>
